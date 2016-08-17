@@ -1,7 +1,7 @@
 import Foundation
 import Alamofire
 
-public typealias Manager = Alamofire.Manager
+public typealias Manager = Alamofire.SessionManager
 internal typealias Request = Alamofire.Request
 
 /// Choice of parameter encoding.
@@ -11,7 +11,7 @@ public typealias ParameterEncoding = Alamofire.ParameterEncoding
 public typealias RequestMultipartFormData = Alamofire.MultipartFormData
 
 /// Multipart form data encoding result.
-public typealias MultipartFormDataEncodingResult = Alamofire.Manager.MultipartFormDataEncodingResult
+public typealias MultipartFormDataEncodingResult = Alamofire.SessionManager.MultipartFormDataEncodingResult
 public typealias DownloadDestination = Alamofire.Request.DownloadFileDestination
 
 /// Make the Alamofire Request type conform to our type, to prevent leaking Alamofire to plugins.
@@ -23,17 +23,17 @@ internal final class CancellableToken: Cancellable, CustomDebugStringConvertible
     let request: Request?
     private(set) var cancelled: Bool = false
 
-    private var lock: dispatch_semaphore_t = dispatch_semaphore_create(1)
+    private var lock: DispatchSemaphore = DispatchSemaphore(value: 1)
 
     func cancel() {
-        dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER)
-        defer { dispatch_semaphore_signal(lock) }
+        lock.wait(timeout: DispatchTime.distantFuture)
+        defer { lock.signal() }
         guard !cancelled else { return }
         cancelled = true
         cancelAction()
     }
 
-    init(action: () -> Void) {
+    init(action: @escaping () -> Void) {
         self.cancelAction = action
         self.request = nil
     }
