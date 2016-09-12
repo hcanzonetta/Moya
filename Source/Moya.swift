@@ -56,9 +56,9 @@ public class MoyaProvider<Target: TargetType> {
     public internal(set) var inflightRequests = Dictionary<Endpoint<Target>, [Moya.Completion]>()
 
     /// Initializes a provider.
-    public init(endpointClosure: EndpointClosure = MoyaProvider.DefaultEndpointMapping,
-        requestClosure: RequestClosure = MoyaProvider.DefaultRequestMapping,
-        stubClosure: StubClosure = MoyaProvider.NeverStub,
+    public init(endpointClosure: @escaping EndpointClosure = MoyaProvider.DefaultEndpointMapping,
+        requestClosure: @escaping RequestClosure = MoyaProvider.DefaultRequestMapping,
+        stubClosure: @escaping StubClosure = MoyaProvider.NeverStub,
         manager: Manager = MoyaProvider<Target>.DefaultAlamofireManager(),
         plugins: [PluginType] = [],
         trackInflights: Bool = false) {
@@ -77,18 +77,18 @@ public class MoyaProvider<Target: TargetType> {
     }
 
     /// Designated request-making method. Returns a Cancellable token to cancel the request later.
-    public func request(_ target: Target, completion: Moya.Completion) -> Cancellable {
+    public func request(_ target: Target, completion: @escaping Moya.Completion) -> Cancellable {
         return self.request(target, queue: nil, completion: completion)
     }
 
     /// Designated request-making method with queue option. Returns a Cancellable token to cancel the request later.
-    public func request(_ target: Target, queue: DispatchQueue?, progress: Moya.ProgressBlock? = nil, completion: Moya.Completion) -> Cancellable {
+    public func request(_ target: Target, queue: DispatchQueue?, progress: Moya.ProgressBlock? = nil, completion: @escaping Moya.Completion) -> Cancellable {
         return requestNormal(target, queue: queue, progress: progress, completion: completion)
     }
 
     /// When overriding this method, take care to `notifyPluginsOfImpendingStub` and to perform the stub using the `createStubFunction` method.
     /// Note: this was previously in an extension, however it must be in the original class declaration to allow subclasses to override.
-    func stubRequest(_ target: Target, request: URLRequest, completion: Moya.Completion, endpoint: Endpoint<Target>, stubBehavior: Moya.StubBehavior) -> CancellableToken {
+    func stubRequest(_ target: Target, request: URLRequest, completion: @escaping Moya.Completion, endpoint: Endpoint<Target>, stubBehavior: Moya.StubBehavior) -> CancellableToken {
         let cancellableToken = CancellableToken { }
         notifyPluginsOfImpendingStub(request, target: target)
         let plugins = self.plugins

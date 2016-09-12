@@ -7,7 +7,7 @@ internal extension MoyaProvider {
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
     /// Performs normal requests.
-    func requestNormal(_ target: Target, queue: DispatchQueue?, progress: Moya.ProgressBlock?, completion: Moya.Completion) -> Cancellable {
+    func requestNormal(_ target: Target, queue: DispatchQueue?, progress: Moya.ProgressBlock?, completion: @escaping Moya.Completion) -> Cancellable {
         let endpoint = self.endpoint(target)
         let stubBehavior = self.stubClosure(target)
         let cancellableToken = CancellableWrapper()
@@ -99,7 +99,7 @@ internal extension MoyaProvider {
     }
 
     /// Creates a function which, when called, executes the appropriate stubbing behavior for the given parameters.
-    final func createStubFunction(_ token: CancellableToken, forTarget target: Target, withCompletion completion: Moya.Completion, endpoint: Endpoint<Target>, plugins: [PluginType]) -> (() -> ()) {
+    final func createStubFunction(_ token: CancellableToken, forTarget target: Target, withCompletion completion: @escaping Moya.Completion, endpoint: Endpoint<Target>, plugins: [PluginType]) -> (() -> ()) {
         return {
             if token.cancelled {
                 self.cancelCompletion(completion, target: target)
@@ -127,7 +127,7 @@ internal extension MoyaProvider {
 }
 
 fileprivate extension MoyaProvider {
-    fileprivate func sendUploadMultipart(_ target: Target, request: URLRequest, queue: DispatchQueue?, multipartBody: [MultipartFormData], progress: Moya.ProgressBlock? = nil, completion: Moya.Completion) -> CancellableWrapper {
+    fileprivate func sendUploadMultipart(_ target: Target, request: URLRequest, queue: DispatchQueue?, multipartBody: [MultipartFormData], progress: Moya.ProgressBlock? = nil, completion: @escaping Moya.Completion) -> CancellableWrapper {
         let cancellable = CancellableWrapper()
 
         let multipartFormData = { (form: RequestMultipartFormData) -> Void in
@@ -168,22 +168,22 @@ fileprivate extension MoyaProvider {
         return cancellable
     }
 
-    internal func sendUploadFile(_ target: Target, request: URLRequest, queue: DispatchQueue?, file: URL, progress: ProgressBlock? = nil, completion: Completion) -> CancellableToken {
+    internal func sendUploadFile(_ target: Target, request: URLRequest, queue: DispatchQueue?, file: URL, progress: ProgressBlock? = nil, completion: @escaping Completion) -> CancellableToken {
         let alamoRequest = manager.upload(file, with: request)
         return self.sendAlamofireRequest(alamoRequest, target: target, queue: queue, progress: progress, completion: completion)
     }
 
-    internal func sendDownloadRequest(_ target: Target, request: URLRequest, queue: DispatchQueue?, destination: DownloadDestination, progress: ProgressBlock? = nil, completion: Completion) -> CancellableToken {
+    internal func sendDownloadRequest(_ target: Target, request: URLRequest, queue: DispatchQueue?, destination: @escaping DownloadDestination, progress: ProgressBlock? = nil, completion: @escaping Completion) -> CancellableToken {
         let alamoRequest = manager.download(request, to: destination)
         return self.sendAlamofireRequest(alamoRequest, target: target, queue: queue, progress: progress, completion: completion)
     }
 
-    internal func sendRequest(_ target: Target, request: URLRequest, queue: DispatchQueue?, progress: Moya.ProgressBlock?, completion: Moya.Completion) -> CancellableToken {
+    internal func sendRequest(_ target: Target, request: URLRequest, queue: DispatchQueue?, progress: Moya.ProgressBlock?, completion: @escaping Moya.Completion) -> CancellableToken {
         let alamoRequest = manager.request(request)
         return sendAlamofireRequest(alamoRequest, target: target, queue: queue, progress: progress, completion: completion)
     }
 
-    internal func sendAlamofireRequest(_ alamoRequest: Request, target: Target, queue: DispatchQueue?, progress: Moya.ProgressBlock?, completion: Moya.Completion) -> CancellableToken {
+    internal func sendAlamofireRequest(_ alamoRequest: Request, target: Target, queue: DispatchQueue?, progress: Moya.ProgressBlock?, completion: @escaping Moya.Completion) -> CancellableToken {
         // Give plugins the chance to alter the outgoing request
         let plugins = self.plugins
         plugins.forEach { $0.willSendRequest(alamoRequest, target: target) }

@@ -12,7 +12,7 @@ public final class NetworkActivityPlugin: PluginType {
     public typealias NetworkActivityClosure = (_ change: NetworkActivityChangeType) -> ()
     let networkActivityClosure: NetworkActivityClosure
 
-    public init(networkActivityClosure: NetworkActivityClosure) {
+    public init(networkActivityClosure: @escaping NetworkActivityClosure) {
         self.networkActivityClosure = networkActivityClosure
     }
 

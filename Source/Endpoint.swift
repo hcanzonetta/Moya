@@ -24,7 +24,7 @@ public class Endpoint<Target> {
 
     /// Main initializer for Endpoint.
     public init(URL: String,
-        sampleResponseClosure: SampleResponseClosure,
+        sampleResponseClosure: @escaping SampleResponseClosure,
         method: Moya.Method = Moya.Method.GET,
         parameters: [String: AnyObject]? = nil,
         parameterEncoding: Moya.ParameterEncoding = .url,
